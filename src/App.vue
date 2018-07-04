@@ -65,10 +65,11 @@ export default {
 .container {
   height: 100%;
   display: flex;
+  width: 750rpx;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 200rpx 0;
+  /* padding: 200rpx 0; */
   box-sizing: border-box;
 }
 /* this rule will be remove */
@@ -77,5 +78,18 @@ export default {
   -moz-transition: width 2s;
   -webkit-transition: width 2s;
   -o-transition: width 2s;
+}
+page{
+  height: 100%;
+}
+page text{
+  font-size: 13px;
+  color: #fff;
+  font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
+}
+page view{
+  font-size: 13px;
+  color: #fff;
+  font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 </style>
