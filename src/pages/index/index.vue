@@ -42,7 +42,7 @@
                 <img :src="imagesArr[ind]" alt="">
               </div>
               <div class="expon_banner">
-                <p class="expon_title">{{ list.tipt + '  ' + list.title }}</p>
+                <p class="expon_title">{{ list.tipt + '  ' + list.zs }}</p>
                 <p class="expon_des"> {{ list.des }}</p>
               </div>
             </div>
