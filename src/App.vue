@@ -1,6 +1,5 @@
 <script>
 import {mapState, mapMutations} from 'vuex'
-import bmap from '@/libs/bmap-wx.js'
 export default {
   created () {
     // 调用API从本地缓存中获取数据
@@ -29,30 +28,7 @@ export default {
           }
           this.SET_CITY(json)
         }
-      } else {
-        wx.getLocation({
-          type: 'wgs84',
-          success: res => {
-            let str = res.longitude + ',' + res.latitude
-            this.getCurrentCity(str)
-          }
-        })
       }
-    },
-    getCurrentCity (str) {
-      var BMap = new bmap.BMapWX({
-        ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
-      })
-      // 发起weather请求
-      BMap.weather({
-        location: str,
-        fail (error) {
-          console.log(error)
-        },
-        success: res => {
-          this.SET_CITY({name: res.currentWeather[0].currentCity, position: str})
-        }
-      })
     },
     ...mapMutations([
       'SET_CITY'

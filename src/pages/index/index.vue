@@ -55,7 +55,7 @@
 <script>
 import card from '@/components/card'
 import bmap from '@/libs/bmap-wx.js'
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
   data () {
     return {
@@ -143,11 +143,37 @@ export default {
           let course = this.getCity(this.city[i])
           promiseAll.push(course)
         }
-        console.log(promiseAll)
         let res = await Promise.all(promiseAll)
         resolve(res)
       })
-    }
+    },
+    isEmptyObject (obj) {
+      for (var key in obj) {
+        return false
+      }
+      return true
+    },
+    getCurrentCity (str) {
+      var BMap = new bmap.BMapWX({
+        ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
+      })
+      // 发起weather请求
+      BMap.weather({
+        location: str,
+        fail (error) {
+          console.log(error)
+        },
+        success: async (res) => {
+          this.SET_CITY({name: res.currentWeather[0].currentCity, position: str})
+          let respone = await this.getAllCity()
+          this.setWeatherData(respone)
+          wx.hideLoading()
+        }
+      })
+    },
+    ...mapMutations([
+      'SET_CITY'
+    ])
   },
   async created () {
     //  全部异步获取缓存地区的所有天气
@@ -157,14 +183,22 @@ export default {
     // 获取手机可用像素高度
     wx.getSystemInfo({
       success: (res) => {
-        console.log(res.windowHeight)
         this.swiperHeight = res.windowHeight + 'px'
       }
     })
-    let res = await this.getAllCity()
-    console.log(res)
-    this.setWeatherData(res)
-    wx.hideLoading()
+    if (this.isEmptyObject(this.city)) {
+      wx.getLocation({
+        type: 'wgs84',
+        success: res => {
+          let str = res.longitude + ',' + res.latitude
+          this.getCurrentCity(str)
+        }
+      })
+    } else {
+      let res = await this.getAllCity()
+      this.setWeatherData(res)
+      wx.hideLoading()
+    }
   }
 }
 </script>
