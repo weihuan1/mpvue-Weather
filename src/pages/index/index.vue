@@ -192,6 +192,14 @@ export default {
         success: res => {
           let str = res.longitude + ',' + res.latitude
           this.getCurrentCity(str)
+        },
+        fail: error => {
+          console.log(error)
+          wx.hideLoading()
+          wx.showModal({
+            title: '提示',
+            content: '位置服务已被拒绝，请在后台开启后使用'
+          })
         }
       })
     } else {
