@@ -1,13 +1,9 @@
 <template>
-  <div class="container" @click="clickHandle('test click', $event)">
+  <div class="container">
 
-    <div class="userinfo" @click="bindViewTap">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
-      <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
-      </div>
-    </div>
-
+    <open-data type="userAvatarUrl"></open-data>
+    <open-data type="userNickName" lang="zh_CN"></open-data>
+    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"> </button>
     <div class="usermotto">
       <div class="user-motto">
         <card :text="motto"></card>
@@ -19,7 +15,8 @@
 
 <script>
 import card from '@/components/card'
-
+import bmap from '@/libs/bmap-wx.js'
+import {mapState} from 'vuex'
 export default {
   data () {
     return {
@@ -31,32 +28,48 @@ export default {
   components: {
     card
   },
-
+  computed: {
+    ...mapState({
+      city: state => state.weather.city
+    })
+  },
   methods: {
     bindViewTap () {
       const url = '../logs/main'
       wx.navigateTo({ url })
     },
-    getUserInfo () {
-      // 调用登录接口
-      wx.login({
-        success: (res) => {
-          if (res.code) {
-            wx.getUserInfo({
-              success: (res) => {
-                this.userInfo = res.userInfo
-                // console.log(res)
-              }
-            })
+    getCity (position) {
+      return new Promise((resolve, reject) => {
+        var BMap = new bmap.BMapWX({
+          ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
+        })
+        BMap.weather({
+          location: position,
+          fail (error) {
+            reject(error)
+          },
+          success (res) {
+            resolve(res)
           }
+        })
+      })
+    },
+    getAllCity () {
+      return new Promise(async (resolve, reject) => {
+        let promiseAll = []
+        for (let i in this.city) {
+          let course = this.getCity(this.city[i])
+          promiseAll.push(course)
         }
+        let res = await Promise.all(promiseAll)
+        resolve(res)
       })
     }
   },
-
-  created () {
-    // 调用应用实例的方法获取全局数据
-    this.getUserInfo()
+  async created () {
+    //  全部异步获取缓存地区的所有天气
+    let res = await this.getAllCity()
+    console.log(res)
   }
 }
 </script>

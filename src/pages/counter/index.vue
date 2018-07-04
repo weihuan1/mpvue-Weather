@@ -14,7 +14,7 @@
 <script>
 // Use Vuex
 import store from './store'
-import fetch from '@/utils/fetch'
+// import fetch from '@/utils/fetch'
 export default {
   computed: {
     count () {
@@ -27,9 +27,9 @@ export default {
     }
   },
   async created () {
-    console.log(fetch)
-    const res = await fetch('http://www.weather.com.cn/data/sk/101010100.html')
-    console.log(res)
+    // console.log(fetch)
+    // const res = await fetch('http://www.weather.com.cn/data/sk/101010100.html')
+    // console.log(res)
   },
   methods: {
     increment () {
