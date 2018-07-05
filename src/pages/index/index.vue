@@ -15,39 +15,42 @@
       :style="{ 'height' : swiperHeight}" 
       :indicator-dots="true"
       :indicator-active-color="'#ffffff'">
-        <swiper-item v-for="(item, index) in weatherData" class="swiper_item" :key="index">
-          <div class="weather_wrap">
-            <p><span class="city_name">{{ item.currentCity }}</span></p>
-            <p class="weather_title">{{ item.weather_data[0].weather }}</p>
-            <span class="weather_data">{{ item.currentTime }} </span>
-            <p class="weather_temperature">{{ item.currentTemperature }}</p>
-            <span class="weather_pm">{{ item.pmGrade }}</span>
-          </div>
-          <div class="weather_other">
-            <div class="other_item" v-for="(list, ind) in item.weather_data" :key="ind">
-              <span class="other_name">{{ list.time }}</span>
-              <div class="other_icon">
-                <img :src="list.dayPictureUrl" alt="">
-                <text class="icon_space">~</text>  
-                <img :src="list.nightPictureUrl" alt="">
-              </div>
-              <span>{{ list.temperature }}</span>
-              <span>{{ list.weather }}</span>
-              <span>{{ list.wind }}</span>
+        <scroll-view scroll-y  style="height: 100%;">
+          <swiper-item v-for="(item, index) in weatherData" class="swiper_item" :key="index">
+            <div class="weather_wrap">
+              <p><span class="city_name">{{ item.currentCity }}</span></p>
+              <p class="weather_title">{{ item.weather_data[0].weather }}</p>
+              <span class="weather_data">{{ item.currentTime }} </span>
+              <p class="weather_temperature">{{ item.currentTemperature }}</p>
+              <span class="weather_pm">{{ item.pmGrade }}</span>
             </div>
-          </div>
-          <div class="exponential_wrap">
-            <div class="exponential_item" v-for="(list, ind) in item.index" :key="ind">
-              <div class="expon_img">
-                <img :src="imagesArr[ind]" alt="">
-              </div>
-              <div class="expon_banner">
-                <p class="expon_title">{{ list.tipt + '  ' + list.zs }}</p>
-                <p class="expon_des"> {{ list.des }}</p>
+            <div class="weather_other">
+              <div class="other_item" v-for="(list, ind) in item.weather_data" :key="ind">
+                <span class="other_name">{{ list.time }}</span>
+                <div class="other_icon">
+                  <img :src="list.dayPictureUrl" alt="">
+                  <text class="icon_space">~</text>  
+                  <img :src="list.nightPictureUrl" alt=""/>
+                </div>
+                <span>{{ list.temperature }}</span>
+                <span>{{ list.weather }}</span>
+                <span>{{ list.wind }}</span>
               </div>
             </div>
-          </div>
-        </swiper-item>
+            <div class="exponential_wrap">
+              <div class="exponential_item" v-for="(list, ind) in item.index" :key="ind">
+                <div class="expon_img">
+                  <img :src="imagesArr[ind]" alt=""/>
+                </div>
+                <div class="expon_banner">
+                  <p class="expon_title">{{ list.tipt + '  ' + list.zs }}</p>
+                  <p class="expon_des"> {{ list.des }}</p>
+                </div>
+              </div>
+            </div>
+          </swiper-item>
+          <a href="/pages/list/main" class="list" ><img src="../../images/list.png" alt=""></a>
+        </scroll-view>
     </swiper>
   </div>
 </template>
@@ -63,7 +66,7 @@ export default {
       userInfo: {},
       weatherData: [],
       swiperHeight: '150px',
-      imagesArr: ['../../../static/images/clothes.png', '../../../static/images/car.png', '../../../static/images/influenza.png', '../../../static/images/sports.png', '../../../static/images/sunshine.png']
+      imagesArr: ['../../static/images/clothes.png', '../../static/images/car.png', '../../static/images/influenza.png', '../../static/images/sports.png', '../../static/images/sunshine.png']
     }
   },
 
@@ -133,7 +136,7 @@ export default {
       // res.weather_data.forEach((item, index, arr) => {
       //   item.time = item.date.slice(0, 3)
       // })
-      console.log(res)
+      // console.log(res)
       this.weatherData = res
     },
     getAllCity () {
@@ -213,6 +216,7 @@ export default {
 
 <style scoped>
 .swiper_wrap{
+  color:#fff;
   width: 750rpx;
   height: 600rpx;
   background-image: url(http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg);
@@ -221,6 +225,24 @@ export default {
   position: relative;
   padding-top: 20px;
   text-align: center
+}
+.list{
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  z-index: 66;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  background-color: red;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.7)
+}
+.list img{
+  height: 20px;
+  width: 20px;
 }
 .weather_pm{
   display: inline-block;
@@ -298,11 +320,12 @@ export default {
 .icon_space{
   font-size: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  margin: 0 6px;
+  margin: 0 4px;
 }
 .other_icon img {
-  width: 40rpx;
-  height: 40rpx;
+  width: 26px;
+  height: 20px;
+  border-radius: 5px;
 }
 .exponential_item img{
   margin: 0 20px;

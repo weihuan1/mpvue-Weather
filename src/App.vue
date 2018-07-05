@@ -60,12 +60,10 @@ page{
 }
 page text{
   font-size: 13px;
-  color: #fff;
   font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 page view{
   font-size: 13px;
-  color: #fff;
   font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 </style>
