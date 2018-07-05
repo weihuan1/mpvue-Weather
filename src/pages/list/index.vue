@@ -8,8 +8,7 @@
         </div>
         <div class="list_m">
           <img :src="item.dayPictureUrl" alt="">
-          <text class="icon_space">~</text> 
-          <img :src="item.nightPictureUrl" alt="">
+          <text class="icon_space">{{ item.weatherText }}</text> 
         </div>
         <div class="list_r">
           {{ item[selectTemperature] + '°'  }}
@@ -31,7 +30,8 @@
 
 <script>
 import card from '@/components/card'
-import bmap from '@/libs/bmap-wx.js'
+// import bmap from '@/libs/bmap-wx.js'
+import fetch from '@/utils/fetch'
 import {mapState, mapMutations} from 'vuex'
 
 export default {
@@ -59,37 +59,47 @@ export default {
       // console.log(data)
       this.listData = []
       data.forEach((item, index, arr) => {
+        let respone = item.HeWeather6[0]
         let data = {}
-        data.city = item.currentCity
-        data.centigrade = parseInt(item.weather_data[0].date.slice(-4, -2))
-        data.dayPictureUrl = item.weather_data[0].dayPictureUrl
-        data.nightPictureUrl = item.weather_data[0].nightPictureUrl
+        data.city = respone.basic.location
+        data.centigrade = respone.now.tmp
+        data.dayPictureUrl = 'https://cdn.heweather.com/cond_icon/' + respone.now.cond_code + '.png'
         data.Fahrenheit = parseInt(data.centigrade * 1.8 + 32)
+        // data.weatherText = respone.now.cond_txt + '    ' + respone.now.wind_dir + respone.now.wind_sc + '级'
+        data.weatherText = respone.now.cond_txt
         this.listData.push(data)
       })
-      // console.log(this.listData)
     },
-    getCity (position) {
-      return new Promise((resolve, reject) => {
-        var BMap = new bmap.BMapWX({
-          ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
-        })
-        BMap.weather({
+    // 修改为接入和风天气数据api
+    async getCity (position) {
+      // return new Promise(async (resolve, reject) => {
+      // var BMap = new bmap.BMapWX({
+      //   ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
+      // })
+      // BMap.weather({
+      //   location: position,
+      //   fail (error) {
+      //     reject(error)
+      //   },
+      //   success (res) {
+      //     resolve(res.originalData.results[0])
+      //   }
+      // })
+      return fetch({
+        url: 'https://free-api.heweather.com/s6/weather/now',
+        params: {
           location: position,
-          fail (error) {
-            reject(error)
-          },
-          success (res) {
-            resolve(res.originalData.results[0])
-          }
-        })
+          t: new Date(),
+          key: 'eeee8bfe147b4fb994647eb384daecf1'
+        }
       })
+      // })
     },
     getAllCity () {
       return new Promise(async (resolve, reject) => {
         let promiseAll = []
         for (let i in this.city) {
-          let course = this.getCity(this.city[i])
+          let course = this.getCity(i)
           promiseAll.push(course)
         }
         let res = await Promise.all(promiseAll)
@@ -109,7 +119,7 @@ export default {
     // console.log(this.currentTime)
     // console.log(this.currentTime)
     let res = await this.getAllCity()
-    // console.log(res)
+    console.log(res)
     this.setListData(res)
     wx.hideLoading()
   },
@@ -130,20 +140,37 @@ page{
 .list_name{
   font-size: 22px;
 }
+.list_l{
+  width: 260rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .list_r{
   font-size: 28px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list_m {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 20rpx;
+  display: flex;
+  align-items: center;
 }
 .list_m img{
   width: 26px;
-  height: 20px;
-  border-radius: 5px;
+  height: 26px;
 }
 .list{
   display: flex;
   height: 80rpx;
   padding: 10px 15px;
   background-color: rgba(255, 255, 255, 0.4);
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
   position: relative;
 }
@@ -168,6 +195,9 @@ page{
   font-size: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   margin: 0 6px;
+}
+.list_tooggle{
+   flex: 1;
 }
 .list_tooggle span{
   font-size: 16px;
