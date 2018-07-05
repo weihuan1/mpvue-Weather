@@ -20,6 +20,8 @@ export default {
   methods: {
     getCityData () {
       const cityData = wx.getStorageSync('city')
+      const currentCity = wx.getStorageSync('currentCity')
+      this.CHANGE_CURRENT_CITY(currentCity)
       if (cityData) {
         for (let i in cityData) {
           let json = {
@@ -31,7 +33,8 @@ export default {
       }
     },
     ...mapMutations([
-      'SET_CITY'
+      'SET_CITY',
+      'CHANGE_CURRENT_CITY'
     ])
   }
 }
@@ -60,10 +63,12 @@ page{
 }
 page text{
   font-size: 13px;
+  color: #24292e;
   font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 page view{
   font-size: 13px;
+  color: #24292e;
   font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 </style>

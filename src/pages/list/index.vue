@@ -21,9 +21,9 @@
           <span> / </span>
           <span @click="toggleTemperature('Fahrenheit')" :class="{ 'linght' :  selectTemperature === 'Fahrenheit'}">℉</span>
         </p>
-        <p class="list_add">
+        <a href="/pages/queryCity/main" class="list_add">
           <img src="../../images/add.png" alt="">
-        </p>
+        </a>
       </div>
     </div>
   </div>
@@ -56,17 +56,18 @@ export default {
       console.log(this.selectTemperature)
     },
     setListData (data) {
-      console.log(data)
+      // console.log(data)
+      this.listData = []
       data.forEach((item, index, arr) => {
         let data = {}
         data.city = item.currentCity
         data.centigrade = parseInt(item.weather_data[0].date.slice(-4, -2))
         data.dayPictureUrl = item.weather_data[0].dayPictureUrl
         data.nightPictureUrl = item.weather_data[0].nightPictureUrl
-        data.Fahrenheit = data.centigrade * 1.8 + 32
+        data.Fahrenheit = parseInt(data.centigrade * 1.8 + 32)
         this.listData.push(data)
       })
-      console.log(this.listData)
+      // console.log(this.listData)
     },
     getCity (position) {
       return new Promise((resolve, reject) => {
@@ -100,20 +101,23 @@ export default {
       'REMOVE_CITY': 'REMOVE_CITY'
     })
   },
-  async created () {
+  async onShow () {
     wx.showLoading({
       title: '加载中'
     })
-    const time = new Date()
-    let minutes = parseInt(time.getMinutes()) >= 10 ? time.getMinutes() : '0' + time.getMinutes()
-    let timeInterval = parseInt(time.getHours()) >= 12 ? '下午' : '上午'
-    this.currentTime = timeInterval + time.getHours() + ':' + minutes
     // console.log(this.city)
+    // console.log(this.currentTime)
     // console.log(this.currentTime)
     let res = await this.getAllCity()
     // console.log(res)
     this.setListData(res)
     wx.hideLoading()
+  },
+  async created () {
+    const time = new Date()
+    let minutes = parseInt(time.getMinutes()) >= 10 ? time.getMinutes() : '0' + time.getMinutes()
+    let timeInterval = parseInt(time.getHours()) >= 12 ? '下午' : '上午'
+    this.currentTime = timeInterval + time.getHours() + ':' + minutes
   }
 }
 </script>

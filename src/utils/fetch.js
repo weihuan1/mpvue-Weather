@@ -1,10 +1,10 @@
 //  使用Promise 封装微信request服务
-export default function fetch (url, options = {}) {
-  const { methods = 'GET', body = {}, showError = true } = options
+export default function fetch (options = {}) {
+  const {methods = 'GET', params = {}, showError = true, url = ''} = options
   return new Promise((resolve, reject) => {
     wx.request({
       url,
-      data: body,
+      data: params,
       methods,
       header: {
         'content-type': 'application/json'

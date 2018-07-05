@@ -7,6 +7,6 @@ app.$mount()
 
 export default {
   config: {
-    navigationBarTitleText: '列表'
+    navigationBarTitleText: '选择城市'
   }
 }

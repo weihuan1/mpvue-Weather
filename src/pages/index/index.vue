@@ -69,7 +69,6 @@ export default {
       imagesArr: ['../../static/images/clothes.png', '../../static/images/car.png', '../../static/images/influenza.png', '../../static/images/sports.png', '../../static/images/sunshine.png']
     }
   },
-
   components: {
     card
   },
@@ -168,6 +167,7 @@ export default {
         },
         success: async (res) => {
           this.SET_CITY({name: res.currentWeather[0].currentCity, position: str})
+          this.CHANGE_CURRENT_CITY(res.currentWeather[0].currentCity)
           let respone = await this.getAllCity()
           this.setWeatherData(respone)
           wx.hideLoading()
@@ -175,7 +175,8 @@ export default {
       })
     },
     ...mapMutations([
-      'SET_CITY'
+      'SET_CITY',
+      'CHANGE_CURRENT_CITY'
     ])
   },
   async created () {
