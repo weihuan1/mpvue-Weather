@@ -58,6 +58,8 @@
 <script>
 import card from '@/components/card'
 import bmap from '@/libs/bmap-wx.js'
+import fetch from '@/utils/fetch.js'
+import {getWeek} from '@/utils/index'
 import {mapState, mapMutations} from 'vuex'
 export default {
   data () {
@@ -82,20 +84,17 @@ export default {
       const url = '../logs/main'
       wx.navigateTo({ url })
     },
-    getCity (position) {
-      return new Promise((resolve, reject) => {
-        var BMap = new bmap.BMapWX({
-          ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
-        })
-        BMap.weather({
-          location: position,
-          fail (error) {
-            reject(error)
-          },
-          success (res) {
-            resolve(res.originalData.results[0])
+    async getCity (position) {
+      // 同步获取实时数据 未来3天数据 逐小时预报数据
+      return new Promise(async (resolve, reject) => {
+        let res = await fetch({
+          url: 'https://free-api.heweather.com/s6/weather',
+          params: {
+            location: position,
+            key: 'eeee8bfe147b4fb994647eb384daecf1'
           }
         })
+        resolve(res.HeWeather6[0])
       })
     },
     // 获取PM2.5划分值
@@ -117,35 +116,27 @@ export default {
     },
     // 设置原数据
     setWeatherData (res) {
-      const time = new Date()
+      // console.log(res)
+      let time = new Date()
       res.forEach((item, index, arr) => {
-        let timeStr = time.getHours() + ':' + time.getMinutes()
-        let date1 = item.weather_data[0].date
-        item.currentTime = date1.slice(3, 5) + '-' + date1.slice(6, 8) + '  ' + timeStr + '  更新'
-        item.currentTemperature = date1.slice(14, -2) + '°'
-        item.pmGrade = this.getPmGrade(item.pm25)
-        item.weather_data.forEach((list, ind, arr1) => {
-          if (ind === 0) {
-            list.time = '今天'
-          } else {
-            list.time = list.date.slice(0, 3)
-          }
+        let minuties = time.getMinutes() >= 10 ? time.getMinutes() : '0' + time.getMinutes()
+        item.currentTime = item.update.loc.slice(5, 11) + time.getHours() + ':' + minuties + ' 更新'
+        item.daily_forecast.forEach((list, ind, arr1) => {
+          list.nowWeek = getWeek(ind)
         })
       })
-      // res.weather_data.forEach((item, index, arr) => {
-      //   item.time = item.date.slice(0, 3)
-      // })
-      // console.log(res)
       this.weatherData = res
+      console.log(this.weatherData)
     },
     getAllCity () {
       return new Promise(async (resolve, reject) => {
         let promiseAll = []
         for (let i in this.city) {
-          let course = this.getCity(this.city[i])
+          let course = this.getCity(i)
           promiseAll.push(course)
         }
         let res = await Promise.all(promiseAll)
+        // console.log(res)
         resolve(res)
       })
     },

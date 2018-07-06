@@ -18,7 +18,22 @@ export function formatTime (date) {
   return `${t1} ${t2}`
 }
 
+// 获取本周 默认第一项为今天 依次往后
+export function getWeek (index = 0) {
+  if (index === 0) {
+    return '今天'
+  } else {
+    const now = new Date()
+    const weekData = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+    const dayLenght = now.getDay() + index
+    let len = dayLenght >= weekData.length ? dayLenght % weekData.length : dayLenght
+    let week = weekData[len]
+    return week
+  }
+}
+
 export default {
   formatNumber,
-  formatTime
+  formatTime,
+  getWeek
 }

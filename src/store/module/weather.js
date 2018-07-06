@@ -4,7 +4,6 @@ const state = {
 }
 const mutations = {
   SET_CITY (state, payload) {
-    console.log(payload)
     if (!state.city[payload.name]) {
       state.city[payload.name] = payload.position
       wx.setStorageSync('city', state.city)
