@@ -10,7 +10,8 @@ const mutations = {
     }
   },
   REMOVE_CITY (state, payload) {
-    delete state.city[payload.name]
+    delete state.city[payload]
+    wx.setStorageSync('city', state.city)
   },
   CHANGE_CURRENT_CITY (state, payload) {
     state.currentCity = payload

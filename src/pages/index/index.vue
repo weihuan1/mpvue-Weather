@@ -1,63 +1,53 @@
 <template>
   <div class="container">
-
-    <!-- <open-data type="userAvatarUrl"></open-data>
-    <open-data type="userNickName" lang="zh_CN"></open-data>
-    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"> </button>
-    <div class="usermotto">
-      <div class="user-motto">
-        <card :text="motto"></card>
-      </div>
-    </div> -->
-    <!-- <a href="/pages/logs/main" class="counter">去往Vuex示页面</a> -->
     <swiper 
       class="swiper_wrap"
       :style="{ 'height' : swiperHeight}" 
       :indicator-dots="true"
+      :current="currentSwiper"
       :indicator-active-color="'#ffffff'">
-        <scroll-view scroll-y  style="height: 100%;">
-          <swiper-item v-for="(item, index) in weatherData" class="swiper_item" :key="index">
+        <swiper-item v-for="(item, index) in weatherData" class="swiper_item" :key="index">
+          <scroll-view scroll-y  style="height: 100%;">
             <div class="weather_wrap">
-              <p><span class="city_name">{{ item.currentCity }}</span></p>
-              <p class="weather_title">{{ item.weather_data[0].weather }}</p>
+              <p><span class="city_name">{{ item.basic.location }}</span></p>
+              <p class="weather_title"><img :src="item.cond_pictureUrl" alt=""/>{{ item.now.cond_txt }}</p>
               <span class="weather_data">{{ item.currentTime }} </span>
-              <p class="weather_temperature">{{ item.currentTemperature }}</p>
-              <span class="weather_pm">{{ item.pmGrade }}</span>
+              <p class="weather_temperature">{{ item.now.tmp + '°' }}</p>
             </div>
             <div class="weather_other">
-              <div class="other_item" v-for="(list, ind) in item.weather_data" :key="ind">
-                <span class="other_name">{{ list.time }}</span>
+              <div class="other_item" v-for="(list, ind) in item.daily_forecast" :key="ind">
+                <span class="other_name">{{ list.nowWeek }}</span>
+                <span>{{ list.tmp_min + '~' + list.tmp_max + '℃'}}</span>
+                <!-- <span class="icon_space">{{ list.cond_txt_d + '转' + list.cond_txt_n }}</span> -->
                 <div class="other_icon">
-                  <img :src="list.dayPictureUrl" alt="">
+                  <img :src="list.pictureUrl_d" alt="">
                   <text class="icon_space">~</text>  
-                  <img :src="list.nightPictureUrl" alt=""/>
+                  <img :src="list.pictureUrl_n" alt=""/>
                 </div>
-                <span>{{ list.temperature }}</span>
-                <span>{{ list.weather }}</span>
-                <span>{{ list.wind }}</span>
+                <span>{{ list.wind_dir + list.wind_sc + '级' }}</span>
               </div>
             </div>
             <div class="exponential_wrap">
-              <div class="exponential_item" v-for="(list, ind) in item.index" :key="ind">
+              <div class="exponential_item" v-for="(list, ind) in item.lifestyle" :key="ind">
                 <div class="expon_img">
-                  <img :src="imagesArr[ind]" alt=""/>
+                  <img :src="list.liftPictureUrl" alt=""/>
                 </div>
                 <div class="expon_banner">
-                  <p class="expon_title">{{ list.tipt + '  ' + list.zs }}</p>
-                  <p class="expon_des"> {{ list.des }}</p>
+                  <p class="expon_title">{{ lifeType[list.type] + '  ' + list.brf }}</p>
+                  <p class="expon_des"> {{ list.txt }}</p>
                 </div>
               </div>
             </div>
-          </swiper-item>
-          <a href="/pages/list/main" class="list" ><img src="../../images/list.png" alt=""></a>
-        </scroll-view>
+          </scroll-view>
+        </swiper-item>
     </swiper>
+    <a href="/pages/list/main" class="list" ><img src="../../images/list.png" alt=""></a>
   </div>
 </template>
 
 <script>
 import card from '@/components/card'
-import bmap from '@/libs/bmap-wx.js'
+// import bmap from '@/libs/bmap-wx.js'
 import fetch from '@/utils/fetch.js'
 import {getWeek} from '@/utils/index'
 import {mapState, mapMutations} from 'vuex'
@@ -67,8 +57,9 @@ export default {
       motto: 'My weather forecast',
       userInfo: {},
       weatherData: [],
+      lifeType: {comf: '舒适度指数', cw: '洗车指数', drsg: '穿衣指数', flu: '感冒指数', sport: '运动指数', trav: '旅游指数', uv: '紫外线指数', air: '空气污染扩散条件指数', ac: '空调开启指数', ag: '过敏指数', gl: '太阳镜指数', mu: '化妆指数', airc: '晾晒指数', ptfc: '交通指数', fsh: '钓鱼指数', spi: '防晒指数'},
       swiperHeight: '150px',
-      imagesArr: ['../../static/images/clothes.png', '../../static/images/car.png', '../../static/images/influenza.png', '../../static/images/sports.png', '../../static/images/sunshine.png']
+      currentSwiper: 0
     }
   },
   components: {
@@ -76,7 +67,9 @@ export default {
   },
   computed: {
     ...mapState({
-      city: state => state.weather.city
+      city: state => state.weather.city,
+      hefeng_key: state => state.hefeng_key,
+      currentCity: state => state.weather.currentCity
     })
   },
   methods: {
@@ -91,10 +84,14 @@ export default {
           url: 'https://free-api.heweather.com/s6/weather',
           params: {
             location: position,
-            key: 'eeee8bfe147b4fb994647eb384daecf1'
+            key: this.hefeng_key
           }
         })
-        resolve(res.HeWeather6[0])
+        if (res.HeWeather6[0].basic) {
+          resolve(res.HeWeather6[0])
+        } else {
+          reject(res.HeWeather6[0].status)
+        }
       })
     },
     // 获取PM2.5划分值
@@ -116,29 +113,34 @@ export default {
     },
     // 设置原数据
     setWeatherData (res) {
-      // console.log(res)
       let time = new Date()
       res.forEach((item, index, arr) => {
         let minuties = time.getMinutes() >= 10 ? time.getMinutes() : '0' + time.getMinutes()
         item.currentTime = item.update.loc.slice(5, 11) + time.getHours() + ':' + minuties + ' 更新'
+        item.cond_pictureUrl = 'https://cdn.heweather.com/cond_icon/' + item.now.cond_code + '.png'
         item.daily_forecast.forEach((list, ind, arr1) => {
           list.nowWeek = getWeek(ind)
+          list.pictureUrl_d = 'https://cdn.heweather.com/cond_icon/' + list.cond_code_d + '.png'
+          list.pictureUrl_n = 'https://cdn.heweather.com/cond_icon/' + list.cond_code_n + '.png'
         })
+        item.lifestyle.forEach((list, ind, arr1) => {
+          list.liftPictureUrl = 'http://p949rmsaf.bkt.clouddn.com/' + list.type + '.png'
+        })
+        // 定位到当前swiper
+        if (item.basic.location === this.currentCity) {
+          this.currentSwiper = index
+        }
       })
+      // console.log(res)
       this.weatherData = res
-      console.log(this.weatherData)
     },
     getAllCity () {
-      return new Promise(async (resolve, reject) => {
-        let promiseAll = []
-        for (let i in this.city) {
-          let course = this.getCity(i)
-          promiseAll.push(course)
-        }
-        let res = await Promise.all(promiseAll)
-        // console.log(res)
-        resolve(res)
-      })
+      let promiseAll = []
+      for (let i in this.city) {
+        let course = this.getCity(i)
+        promiseAll.push(course)
+      }
+      return Promise.all(promiseAll)
     },
     isEmptyObject (obj) {
       for (var key in obj) {
@@ -146,24 +148,32 @@ export default {
       }
       return true
     },
-    getCurrentCity (str) {
-      var BMap = new bmap.BMapWX({
-        ak: '9YwccUDP6itfMPMRcH1R88aVRiRapkev'
-      })
-      // 发起weather请求
-      BMap.weather({
-        location: str,
-        fail (error) {
-          console.log(error)
-        },
-        success: async (res) => {
-          this.SET_CITY({name: res.currentWeather[0].currentCity, position: str})
-          this.CHANGE_CURRENT_CITY(res.currentWeather[0].currentCity)
-          let respone = await this.getAllCity()
-          this.setWeatherData(respone)
-          wx.hideLoading()
+    async getCurrentCity (str) {
+      let res = await fetch({
+        url: 'https://free-api.heweather.com/s6/weather',
+        params: {
+          location: str,
+          key: this.hefeng_key
         }
       })
+      if (res.HeWeather6[0].basic) {
+        this.SET_CITY({name: res.HeWeather6[0].basic.parent_city, position: str})
+        this.CHANGE_CURRENT_CITY(res.HeWeather6[0].basic.parent_city)
+        this.getAllCity().then(respone => {
+          this.setWeatherData(respone)
+        }).catch(error => {
+          wx.showModal({
+            title: '提示',
+            content: error
+          })
+        })
+        wx.hideLoading()
+      } else {
+        wx.showModal({
+          title: '提示',
+          content: res.HeWeather6[0].status
+        })
+      }
     },
     ...mapMutations([
       'SET_CITY',
@@ -171,15 +181,17 @@ export default {
     ])
   },
   async created () {
-    //  全部异步获取缓存地区的所有天气
-    wx.showLoading({
-      title: '加载中'
-    })
     // 获取手机可用像素高度
     wx.getSystemInfo({
       success: (res) => {
         this.swiperHeight = res.windowHeight + 'px'
       }
+    })
+  },
+  async onShow () {
+    //  全部异步获取缓存地区的所有天气
+    wx.showLoading({
+      title: '加载中'
     })
     if (this.isEmptyObject(this.city)) {
       wx.getLocation({
@@ -198,8 +210,14 @@ export default {
         }
       })
     } else {
-      let res = await this.getAllCity()
-      this.setWeatherData(res)
+      this.getAllCity().then(respone => {
+        this.setWeatherData(respone)
+      }).catch(error => {
+        wx.showModal({
+          title: '提示',
+          content: error
+        })
+      })
       wx.hideLoading()
     }
   }
@@ -245,7 +263,6 @@ export default {
 .weather_temperature{
   font-size: 60px;
   margin-left: 20px;
-  margin-top: 10px;
 }
 .weather_data{
   position: absolute;
@@ -306,18 +323,21 @@ export default {
   margin-top: 20rpx;
 }
 .other_name{
-  margin-bottom: 20rpx;
   font-size: 16px;
 }
-.icon_space{
-  font-size: 20px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  margin: 0 4px;
+.other_icon{
+  margin-top: 10rpx;
 }
-.other_icon img {
+.other_icon img{
   width: 26px;
-  height: 20px;
-  border-radius: 5px;
+  height: 26px;
+  vertical-align: middle;
+}
+.weather_title img{
+  width: 26px;
+  height: 26px;
+  vertical-align: middle;
+  margin-right: 4rpx;
 }
 .exponential_item img{
   margin: 0 20px;

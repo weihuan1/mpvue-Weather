@@ -60,15 +60,14 @@ export default {
 }
 page{
   height: 100%;
+  color: #24292e;
 }
 page text{
   font-size: 13px;
-  color: #24292e;
   font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 page view{
   font-size: 13px;
-  color: #24292e;
   font-family: "Helvetica Neue",Helvetica,'microsoft yahei ui', 'microsoft yahei','simhei',Arial,sans-serif
 }
 </style>

@@ -32,7 +32,8 @@ export default {
 
     },
     ...mapState({
-      'currentCity': state => state.weather.currentCity
+      'currentCity': state => state.weather.currentCity,
+      'hefeng_key': state => state.hefeng_key
     })
   },
   data () {
@@ -44,7 +45,7 @@ export default {
     }
   },
   async onShow () {
-    console.log(this.$store)
+    // console.log(this.$store)
     this.getCityData()
   },
   created () {
@@ -52,7 +53,7 @@ export default {
   methods: {
     // 选择城市
     selectCity (row) {
-      console.log(row)
+      // console.log(row)
       let json = {
         name: row.location,
         position: row.lon + ',' + row.lat
@@ -78,7 +79,7 @@ export default {
         type: 'GET',
         url: 'https://search.heweather.com/find',
         params: {
-          key: 'eeee8bfe147b4fb994647eb384daecf1',
+          key: this.hefeng_key,
           location: this.queryCity,
           group: 'cn'
         }
@@ -102,7 +103,7 @@ export default {
         type: 'GET',
         url: 'https://search.heweather.com/top',
         params: {
-          key: 'eeee8bfe147b4fb994647eb384daecf1',
+          key: this.hefeng_key,
           group: 'cn',
           number: 24
         }
