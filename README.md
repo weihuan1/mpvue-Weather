@@ -1,7 +1,7 @@
 # mpvue-Weather
 一款天气应用微信小程序,使用mpvue框架开发 使用了vuex管理多页面状态
 <p align='center'>
-    <img src='http://p949rmsaf.bkt.clouddn.com/mpvue-Weather.jpg'>
+    <img src='http://p949rmsaf.bkt.clouddn.com/mpvue_logo.jpg'>
 </p>
 
 ## 框架支持
