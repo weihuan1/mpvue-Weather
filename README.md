@@ -1,4 +1,4 @@
-# QuietWeather
+# mpvue-Weather
 一款天气应用微信小程序,使用mpvue框架开发 使用了vuex管理多页面状态
 <p align='center'>
     <!-- <img src='https://user-gold-cdn.xitu.io/2018/7/5/1646880a97f2c931?w=344&h=344&f=jpeg&s=66247'> -->
