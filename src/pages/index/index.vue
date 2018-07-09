@@ -38,6 +38,7 @@
                 </div>
               </div>
             </div>
+            <span class="tips" >数据来源 和风天气</span>  
           </scroll-view>
         </swiper-item>
     </swiper>
@@ -220,12 +221,21 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
+page{
+  background: #70b0ea;
+}
+.tips{
+  display: block;
+  width: 750rpx;
+  height: 50px;
+  text-align: center;
+  margin-top: 10px;
+}
 .swiper_wrap{
   color:#fff;
   width: 750rpx;
   height: 600rpx;
-  background: #70b0ea;
 }
 .weather_wrap{
   position: relative;
