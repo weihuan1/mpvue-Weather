@@ -24,9 +24,9 @@
           <span @click="toggleTemperature('Fahrenheit')" :class="{ 'linght' :  selectTemperature === 'Fahrenheit'}">℉</span>
         </p>
         <span class="list_tooggle" style="font-size:16px;" @click="edit = !edit">{{ edit ? '完成' : '编辑' }}</span>
-        <a href="/pages/queryCity/main" class="list_add">
+        <span href="/pages/queryCity/main" @click="addCityHandle" class="list_add">
           <img src="../../images/add.png" alt="">
-        </a>
+        </span>
       </div>
     </div>
   </div>
@@ -54,6 +54,19 @@ export default {
     }
   },
   methods: {
+    // 增加城市
+    addCityHandle () {
+      if (this.listData.length > 15) {
+        wx.showModal({
+          title: '提示',
+          content: '最多只能添加15项哦！'
+        })
+        return false
+      }
+      wx.navigateTo({
+        url: '/pages/queryCity/main'
+      })
+    },
     // 删除城市
     deleteCity (row, index) {
       let nextCity = this.listData[index - 1].city

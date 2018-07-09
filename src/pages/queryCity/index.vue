@@ -67,7 +67,7 @@ export default {
     },
     // 确定提交
     async submit () {
-      console.log(this.queryCity)
+      // console.log(this.queryCity)
       if (this.queryCity.length === 0) {
         this.queryCityData = []
         return false
@@ -91,7 +91,7 @@ export default {
         this.queryCityData = []
         this.queryTips = true
       }
-      console.log(this.queryCityData)
+      // console.log(this.queryCityData)
       wx.hideLoading()
     },
     // 获取城市列表
