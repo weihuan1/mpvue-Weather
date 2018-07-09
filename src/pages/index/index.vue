@@ -27,7 +27,7 @@
                 <span>{{ list.wind_dir + list.wind_sc + '级' }}</span>
               </div>
             </div>
-            <div class="exponential_wrap">
+            <div class="exponential_wrap" style="margin-bottom: 0">
               <div class="exponential_item" v-for="(list, ind) in item.lifestyle" :key="ind">
                 <div class="expon_img">
                   <img :src="list.liftPictureUrl" alt=""/>
@@ -46,8 +46,6 @@
 </template>
 
 <script>
-import card from '@/components/card'
-// import bmap from '@/libs/bmap-wx.js'
 import fetch from '@/utils/fetch.js'
 import {getWeek} from '@/utils/index'
 import {mapState, mapMutations} from 'vuex'
@@ -62,9 +60,7 @@ export default {
       currentSwiper: 0
     }
   },
-  components: {
-    card
-  },
+  components: {},
   computed: {
     ...mapState({
       city: state => state.weather.city,
@@ -229,7 +225,7 @@ export default {
   color:#fff;
   width: 750rpx;
   height: 600rpx;
-  background-image: url(http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg);
+  background: #70b0ea;
 }
 .weather_wrap{
   position: relative;

@@ -33,15 +33,11 @@
 </template>
 
 <script>
-import card from '@/components/card'
-// import bmap from '@/libs/bmap-wx.js'
 import fetch from '@/utils/fetch'
 import {mapState, mapMutations} from 'vuex'
 
 export default {
-  components: {
-    card
-  },
+  components: {},
   computed: {
     ...mapState({
       city: state => state.weather.city,
@@ -60,6 +56,8 @@ export default {
   methods: {
     // 删除城市
     deleteCity (row, index) {
+      let nextCity = this.listData[index - 1].city
+      this.CHANGE_CURRENT_CITY(nextCity)
       this.REMOVE_CITY(row.city)
       this.listData.splice(index, 1)
     },
@@ -143,7 +141,7 @@ export default {
 
 <style>
 page{
-  background-image: url(http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg);
+  background:#70b0ea;
   color: #fff;
 }
 .list_name{
@@ -195,7 +193,7 @@ page{
   display: flex;
   height: 80rpx;
   padding: 10px 15px;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.12);
   /* justify-content: space-between; */
   align-items: center;
   position: relative;
