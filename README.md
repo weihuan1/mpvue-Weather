@@ -5,7 +5,12 @@
 </p>
 
 ## 框架支持
+ [vue2](https://cn.vuejs.org/v2/guide/) 文档
+ 
+ [vuex2](https://vuex.vuejs.org/zh/guide/) 文档
+ 
  [mpvue](http://mpvue.com/) 文档
+ 
  [微信小程序](https://developers.weixin.qq.com/miniprogram/dev/) 开发文档
  
 ## 数据来源
