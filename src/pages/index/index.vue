@@ -5,26 +5,41 @@
       :style="{ 'height' : swiperHeight}" 
       :indicator-dots="true"
       :current="currentSwiper"
+      @change="changeCurrent"
       :indicator-active-color="'#ffffff'">
-        <swiper-item v-for="(item, index) in weatherData" class="swiper_item" :key="index">
+        <swiper-item v-for="(item, index) in weatherData" class="swiper_item" :key="index" >
           <scroll-view scroll-y  style="height: 100%;">
             <div class="weather_wrap">
               <p><span class="city_name">{{ item.basic.location }}</span></p>
-              <p class="weather_title"><img :src="item.cond_pictureUrl" alt=""/>{{ item.now.cond_txt }}</p>
+              <p class="weather_title">{{ item.now.cond_txt }}</p>
               <span class="weather_data">{{ item.currentTime }} </span>
               <p class="weather_temperature">{{ item.now.tmp + '°' }}</p>
             </div>
+            <div class="weather_now">
+              <p class="now_header">
+                <span class="now_h2">{{ item.daily_forecast[0].nowWeek }}</span>
+                <span class=" today">今天</span>
+                <span>{{ item.daily_forecast[0].tmp_min + '~' + item.daily_forecast[0].tmp_max + '℃'}}</span>
+              </p>
+               <scroll-view scroll-x class="hourly_scroll">
+                  <div class="hourly_wrap">
+                    <div class="hourly_item" v-for="(list, ind) in item.hourly" :key="ind">
+                      <span class="hourly_time">{{ list.times }}</span>
+                      <span class="hourly_icon"><img :src="list.hoerlyPictureUrl" alt=""></span>
+                      <span class="hourly_expone">{{ list.tmp + '°' }}</span>
+                    </div>
+                  </div>
+                </scroll-view>
+            </div>
             <div class="weather_other">
-              <div class="other_item" v-for="(list, ind) in item.daily_forecast" :key="ind">
+              <div class="other_item" v-for="(list, ind) in item.daily_forecast" :key="ind" v-if="ind > 0">
                 <span class="other_name">{{ list.nowWeek }}</span>
-                <span>{{ list.tmp_min + '~' + list.tmp_max + '℃'}}</span>
-                <!-- <span class="icon_space">{{ list.cond_txt_d + '转' + list.cond_txt_n }}</span> -->
                 <div class="other_icon">
                   <img :src="list.pictureUrl_d" alt="">
-                  <text class="icon_space">~</text>  
+                  <text class="icon_space"> ~ </text>  
                   <img :src="list.pictureUrl_n" alt=""/>
                 </div>
-                <span>{{ list.wind_dir + list.wind_sc + '级' }}</span>
+                <span>{{ list.tmp_min + '~' + list.tmp_max + '℃'}}</span>
               </div>
             </div>
             <div class="exponential_wrap" style="margin-bottom: 0">
@@ -70,15 +85,15 @@ export default {
     })
   },
   methods: {
-    bindViewTap () {
-      const url = '../logs/main'
-      wx.navigateTo({ url })
+    //  切换swiper
+    changeCurrent (event) {
+      this.currentSwiper = event.target.current
     },
     async getCity (position) {
       // 同步获取实时数据 未来3天数据 逐小时预报数据
       return new Promise(async (resolve, reject) => {
         let res = await fetch({
-          url: 'https://free-api.heweather.com/s6/weather',
+          url: 'https://free-api.heweather.com/s6/weather/',
           params: {
             location: position,
             key: this.hefeng_key
@@ -123,12 +138,23 @@ export default {
         item.lifestyle.forEach((list, ind, arr1) => {
           list.liftPictureUrl = 'http://p949rmsaf.bkt.clouddn.com/' + list.type + '.png'
         })
+        item.hourly.unshift(Object.assign({}, item.hourly[0]))
+        item.hourly.forEach((list, ind, arr1) => {
+          if (ind === 0) {
+            list.times = '现在'
+            list.hoerlyPictureUrl = 'https://cdn.heweather.com/cond_icon/' + item.now.cond_code + '.png'
+            list.tmp = item.now.tmp
+          } else {
+            let time = parseInt(list.time.slice(-6, -3))
+            list.times = time >= 12 ? '下午' + (time - 12) + '时' : '上午' + time + '时'
+            list.hoerlyPictureUrl = 'https://cdn.heweather.com/cond_icon/' + list.cond_code + '.png'
+          }
+        })
         // 定位到当前swiper
         if (item.basic.location === this.currentCity) {
           this.currentSwiper = index
         }
       })
-      // console.log(res)
       this.weatherData = res
     },
     getAllCity () {
@@ -217,6 +243,11 @@ export default {
       })
       wx.hideLoading()
     }
+  },
+  onHide () {
+    // 离开页面保存当前选中城市
+    let currentCity = this.weatherData[this.currentSwiper].basic.location
+    this.CHANGE_CURRENT_CITY(currentCity)
   }
 }
 </script>
@@ -224,6 +255,45 @@ export default {
 <style >
 page{
   background: #70b0ea;
+}
+.now_header{
+  display: flex;
+  padding: 0 30rpx;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.hourly_scroll{
+  height: 90px;
+  border-top: 1rpx solid #fff;
+  border-bottom: 1rpx solid #fff;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+.hourly_expone{
+  font-size: 20px;
+}
+.hourly_wrap{
+  display: flex;
+  width: 660px;
+  margin-top: 5px;
+}
+.hourly_item{
+  display: flex;
+  flex-direction: column;
+  width: 70px;
+  margin-left: 5px;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+}
+.hourly_wrap .hourly_item:first-child{
+  width: 50px !important;
+}
+.now_h2{
+  font-size: 17px;
+}
+.today{
+  margin-left: 20rpx;
+  flex: 1;
 }
 .tips{
   display: block;
@@ -239,8 +309,15 @@ page{
 }
 .weather_wrap{
   position: relative;
+  width: 750rpx;
   padding-top: 20px;
-  text-align: center
+  text-align: center;
+  top:0;
+  z-index: 66;
+  background-color: #70b0ea;
+}
+.weather_now{
+  /* margin-top: 150px */
 }
 .list{
   position: fixed;
@@ -278,14 +355,17 @@ page{
 .city_name{
   font-size: 30px;
 }
-.weather_other ,.exponential_wrap{
+.weather_other{
+  background-color: rgba(255, 255, 255, 0.12);
+  margin: 20rpx 0;
+  padding: 0 30rpx 40rpx;
+}
+.exponential_wrap{
+  flex-direction: column;
   display: flex;
   background-color: rgba(255, 255, 255, 0.12);
   padding-bottom: 40rpx;
   margin: 20rpx 0;
-}
-.exponential_wrap{
-  flex-direction: column;
 }
 .exponential_item{
   position: relative;
@@ -315,26 +395,27 @@ page{
   background-color: #fff;
   transform: scaleY(0.6)
 }
-/* .expon_banner{
-  display: flex;
-} */
+
 .other_item{
   display: flex;
   flex:1;
   text-align: center;
-  flex-direction: column;
-  justify-content: space-around;
+  flex-direction: row;
+  justify-content: space-between;
 }
 .other_item span{
   margin-top: 20rpx;
 }
 .other_name{
-  font-size: 16px;
+  font-size: 17px;
+  width: 110rpx;
+  text-align: left;
+  white-space: nowrap;
 }
 .other_icon{
   margin-top: 10rpx;
 }
-.other_icon img{
+.other_icon img, .hourly_icon img{
   width: 26px;
   height: 26px;
   vertical-align: middle;

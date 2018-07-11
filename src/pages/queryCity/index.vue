@@ -3,7 +3,7 @@
     <div class="query_header">
       <div class="search_wrap">
         <span class="search_icon"><img src="../../images/search.png" alt=""></span>    
-        <input type="text" confirm-type="search" v-model.trim="queryCity" @bindconfirm="submit" class="search_input" placeholder="请输入城市名称，拼音或英文">
+        <input type="text" confirm-type="search" v-model.trim="queryCity" @confirm="submit" class="search_input" placeholder="请输入城市名称，拼音或英文">
       </div>
       <div class="search_text" @click="submit">搜索</div>
     </div>
