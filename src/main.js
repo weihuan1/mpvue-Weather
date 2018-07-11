@@ -16,9 +16,9 @@ export default {
     pages: ['pages/list/main', 'pages/queryCity/main', '^pages/index/main'],
     window: {
       backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarBackgroundColor: '#70b0ea',
+      navigationBarTitleText: '好天气微预报',
+      navigationBarTextStyle: '#fff'
     }
   }
 }
